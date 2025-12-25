@@ -51,23 +51,34 @@ def example_normalized():
         return inf.read()
 
 
-def test_clipboard_to_markdown(example_full_html, example_markdown):
-    """Test clipboard-to-markdown conversion."""
+def test_html_clipboard_get(example_full_html):
+    """Test html-clipboard get."""
     put_html_on_clipboard(example_full_html)
-    result = run_script("clipboard-to-markdown")
-    assert result.returncode == 0, \
-        f"clipboard-to-markdown failed: {result.stderr}"
-    assert result.stdout == example_markdown, \
-        "clipboard-to-markdown output doesn't match expected markdown"
+    bin_dir = Path(__file__).parent / "bin"
+    html_clipboard = bin_dir / "html-clipboard"
+    result = subprocess.run(
+        [str(html_clipboard), "get"],
+        capture_output=True,
+        text=True
+    )
+    assert result.returncode == 0, f"html-clipboard get failed: {result.stderr}"
+    assert result.stdout == example_full_html, \
+        "html-clipboard get output doesn't match clipboard contents"
 
 
-def test_markdown_to_clipboard(example_markdown, example_normalized):
-    """Test markdown-to-clipboard conversion."""
-    result = run_script("markdown-to-clipboard", input_text=example_markdown)
-    assert result.returncode == 0, \
-        f"markdown-to-clipboard failed: {result.stderr}"
-    assert get_html_from_clipboard() == example_normalized, \
-        "markdown-to-clipboard output doesn't match expected HTML"
+def test_html_clipboard_set(example_full_html):
+    """Test html-clipboard set."""
+    bin_dir = Path(__file__).parent / "bin"
+    html_clipboard = bin_dir / "html-clipboard"
+    result = subprocess.run(
+        [str(html_clipboard), "set"],
+        input=example_full_html,
+        capture_output=True,
+        text=True
+    )
+    assert result.returncode == 0, f"html-clipboard set failed: {result.stderr}"
+    assert get_html_from_clipboard() == example_full_html, \
+        "html-clipboard set didn't put correct HTML on clipboard"
 
 
 def test_markdownify_clipboard(example_full_html, example_markdown):

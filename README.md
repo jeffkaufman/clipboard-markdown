@@ -4,20 +4,18 @@ Mac utilities for interacting with the system clipboard as HTML and Markdown.
 
 ## Overview
 
-This toolkit provides four scripts for working with clipboard content:
+This toolkit provides utilities for working with clipboard content:
 
-- **clipboard-to-markdown** - Extract HTML from clipboard as Markdown
-- **markdown-to-clipboard** - Convert Markdown to HTML and put on clipboard
-  as rich text
 - **markdownify-clipboard** - Convert HTML on clipboard to Markdown text
 - **normalize-clipboard** - Normalize HTML formatting on clipboard by
   round-tripping through Markdown
+- **html-clipboard** - Low-level utility to get/set HTML on the clipboard
 
 ## Requirements
 
 - macOS
-- Python 3
 - [Pandoc](https://pandoc.org/)
+- Xcode Command Line Tools (for building the Swift binary)
 
 ## Installation
 
@@ -26,38 +24,17 @@ This toolkit provides four scripts for working with clipboard content:
    brew install pandoc
    ```
 
-2. Install Python dependencies:
+2. Build the html-clipboard binary:
+   ```bash
+   make
+   ```
+
+3. Install Python dependencies (for testing):
    ```bash
    pip install -r requirements.txt
    ```
 
 ## Usage
-
-### clipboard-to-markdown
-
-Reads HTML from the clipboard and outputs Markdown to stdout.
-
-```bash
-clipboard-to-markdown
-```
-
-**Example:**
-1. Copy some rich text from a web page
-2. Run `clipboard-to-markdown`
-3. See the Markdown representation
-
-### markdown-to-clipboard
-
-Reads Markdown from stdin and puts the rendered HTML on the clipboard as rich
-text.
-
-```bash
-echo "# Hello World" | markdown-to-clipboard
-```
-
-**Example:**
-1. Run `cat document.md | markdown-to-clipboard`
-2. Paste into any application, where it will appear as formatted rich text.
 
 ### markdownify-clipboard
 
@@ -85,6 +62,28 @@ normalize-clipboard
 1. Copy formatted HTML from a document
 2. Run `normalize-clipboard`
 3. Paste.  The HTML will be cleaner and simplified
+
+### html-clipboard
+
+Low-level utility for getting and setting HTML on the clipboard.
+
+```bash
+html-clipboard get        # Print HTML from clipboard to stdout
+html-clipboard set        # Read HTML from stdin and put on clipboard
+```
+
+**Example:**
+```bash
+html-clipboard get | pandoc -f html -t gfm-raw_html  # HTML to Markdown
+echo "<h1>Title</h1>" | html-clipboard set           # Put HTML on clipboard
+```
+
+## Platypus App Bundle
+
+This project is designed to be packaged with [Platypus](https://sveinbjorn.org/platypus)
+as a Mac application. When bundled, the scripts will automatically use resources
+from `$resourcePath` if available, allowing you to bundle `pandoc` and other
+dependencies with the app.
 
 ## Adding to PATH
 

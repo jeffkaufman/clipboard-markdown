@@ -3,8 +3,10 @@ if [ -n "$resourcePath" ]; then
     # Expect scripts in $resourcePath, if set, for Platypus bundle
     # compatibility.
     SCRIPT_DIR="$resourcePath"
+    PANDOC="$resourcePath/pandoc"
 else
     # Otherwise expect them to be present alongside this script.
     SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+    PANDOC="pandoc"
 fi
-python3 "$SCRIPT_DIR/clipboard-to-markdown" | python3 "$SCRIPT_DIR/markdown-to-clipboard"
+"$SCRIPT_DIR/html-clipboard" get | "$PANDOC" -f html -t gfm-raw_html | "$PANDOC" -f gfm -t html | "$SCRIPT_DIR/html-clipboard" set
