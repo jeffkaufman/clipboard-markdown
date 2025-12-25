@@ -1,3 +1,10 @@
 #!/bin/bash
-SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+if [ -n "$resourcePath" ]; then
+    # Expect scripts in $resourcePath, if set, for Platypus bundle
+    # compatibility.
+    SCRIPT_DIR="$resourcePath"
+else
+    # Otherwise expect them to be present alongside this script.
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+fi
 "$SCRIPT_DIR/clipboard-to-markdown" | "$SCRIPT_DIR/markdown-to-clipboard"
