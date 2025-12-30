@@ -43,6 +43,13 @@ install:
 - [Normalize Clipboard.app](https://www.jefftk.com/normalize-clipboard-app.zip)
 - [Markdownify Clipboard.app](https://www.jefftk.com/markdownify-clipboard-app.zip)
 
+   **Note:** If using Chrome, you may see "Suspicious Download Blocked":
+   - Click the download icon (^) in Chrome's toolbar
+   - Find the blocked download
+   - Click **Show all** if needed
+   - Click **Keep** (or **Keep dangerous file**)
+   - Confirm by clicking **Keep** again if prompted
+
 2. **Extract** the `.zip` file by double-clicking it
 
 3. **Move to Applications folder:**
