@@ -117,6 +117,20 @@ $ markdownify-clipboard
 2. Run `markdownify-clipboard`
 3. Paste.  You'll get plain Markdown text
 
+### markdown-to-clipboard
+
+Reads Markdown from stdin, converts it to HTML, and puts it on the clipboard as
+rich text (and plain text), ready to paste.
+
+```bash
+$ markdown-to-clipboard
+```
+
+**Example:**
+```bash
+$ echo "# Title" | markdown-to-clipboard      # Put formatted HTML on clipboard
+```
+
 ### normalize-clipboard
 
 Normalizes HTML formatting by converting clipboard HTML to Markdown and back to
