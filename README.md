@@ -86,6 +86,7 @@ conversion.
 - macOS
 - [Pandoc](https://pandoc.org/)
 - Xcode Command Line Tools (for building the Swift binary)
+- [Platypus](https://sveinbjorn.org/platypus) (for building the .app bundles)
 
 ### Installation
 
@@ -211,4 +212,3 @@ $ make distribute
 
 This creates the zip files referenced in the installation instructions above and
 uploads them to the server. This target is specific to the maintainer's setup.
-
