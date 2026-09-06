@@ -14,6 +14,31 @@ where it would match the style of what I was already working on.
 
 See https://www.jefftk.com/p/clipboard-normalization
 
+## Clipboard Markdown (menu bar app)
+
+`macapp/` holds a single native menu bar app that does all three conversions:
+
+- **Normalize Clipboard** — rich text in, simplified rich text out
+- **Convert Clipboard to Markdown** — rich text in, Markdown out
+- **Convert Clipboard to HTML** — Markdown in, rich text out
+
+It does the conversion itself in Swift, using
+[SwiftSoup](https://github.com/scinfu/SwiftSoup) to parse HTML and
+[swift-markdown](https://github.com/apple/swift-markdown) to render it, so it
+needs no Pandoc and no other setup. It runs in the App Sandbox and is the
+version intended for the Mac App Store. It also offers a "Launch at Login"
+toggle, which works for the app on its own rather than needing a trip through
+System Settings.
+
+To build and install it:
+
+```bash
+$ make app-install
+```
+
+The apps described below are the original Pandoc-based ones, kept for the
+command line tools and for people already using them.
+
 ## Prerequisite: Install Pandoc
 
 If you use Homebrew this is just:
@@ -171,7 +196,15 @@ $ export PATH="$PATH:/path/to/clipboard-markdown/bin"
 
 ## Testing
 
-Install Python dependencies for running tests:
+The menu bar app's conversions have their own test suite, which does not touch
+the system clipboard:
+
+```bash
+$ make app-test
+```
+
+The Pandoc scripts are tested with pytest. Install Python dependencies for
+running those tests:
 ```bash
 $ pip install -r requirements.txt
 ```
@@ -212,3 +245,31 @@ $ make distribute
 This creates the zip files referenced in the installation instructions above and
 uploads them to the server. This target is specific to the maintainer's setup.
 
+## Publishing to the Mac App Store
+
+`make app-store` builds a signed installer package for App Store Connect. It
+needs, one time:
+
+1. An Apple Developer Program membership.
+2. An App ID for `com.jefftk.ClipboardMarkdown` in the developer portal.
+3. "Apple Distribution" and "Mac Installer Distribution" certificates in your
+   keychain (`security find-identity -v` lists what you have).
+4. A Mac App Store provisioning profile for that App ID.
+5. An app record in App Store Connect using the same bundle identifier.
+
+Then:
+
+```bash
+$ SIGN_IDENTITY="Apple Distribution: Your Name (TEAMID)" \
+  INSTALLER_IDENTITY="3rd Party Mac Developer Installer: Your Name (TEAMID)" \
+  PROVISIONING_PROFILE=~/Downloads/Clipboard_Markdown.provisionprofile \
+  BUILD_VERSION=2 \
+  make app-store
+```
+
+`BUILD_VERSION` has to increase with every upload. Upload the resulting
+`ClipboardMarkdown.pkg` with Transporter.app or `xcrun altool --upload-app`.
+
+Note that the Pandoc-based apps cannot go to the App Store: a sandboxed app
+cannot run a binary from `/opt/homebrew`, and Pandoc is GPL-licensed, which is
+incompatible with the App Store's terms.

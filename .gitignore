@@ -7,3 +7,9 @@ markdownify-clipboard-app.zip
 normalize-clipboard-app.zip
 logos/*.icns
 logos/*.iconset
+
+# Native menu bar app (macapp/)
+Clipboard Markdown.app/
+ClipboardMarkdown.pkg
+macapp/.build/
+Clipboard Normalizer (Dev).app/
