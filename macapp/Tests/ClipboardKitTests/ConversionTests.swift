@@ -44,6 +44,13 @@ final class ConversionTests: XCTestCase {
         )
     }
 
+    func testStrikethrough() throws {
+        XCTAssertEqual(
+            try HTMLToMarkdown.convert("<p><s>a</s> <strike>b</strike> <del>c</del></p>"),
+            "~~a~~ ~~b~~ ~~c~~\n"
+        )
+    }
+
     func testSpacesMoveOutsideEmphasisMarkers() throws {
         XCTAssertEqual(
             try HTMLToMarkdown.convert("<p>a<strong> b </strong>c</p>"),
@@ -257,6 +264,41 @@ final class ConversionTests: XCTestCase {
             try ClipboardConversions.normalize(
                 html: "<p><b>b</b> <i>i</i> <strike>s</strike></p>"),
             "<p><strong>b</strong> <em>i</em> <del>s</del></p>"
+        )
+    }
+
+    func testNormalizeKeepsEveryStrikethroughTag() throws {
+        XCTAssertEqual(
+            try ClipboardConversions.normalize(
+                html: "<p><s>a</s> <strike>b</strike> <del>c</del></p>"),
+            "<p><del>a</del> <del>b</del> <del>c</del></p>"
+        )
+    }
+
+    func testNormalizeKeepsSpacesBrowsersCopyAsSpans() throws {
+        // What Chrome puts on the clipboard for 'Example <a href="">link</a>'.
+        XCTAssertEqual(
+            try ClipboardConversions.normalize(
+                html: "<meta charset=\"utf-8\"><span style=\"color:red\">Example<span> </span></span><a href=\"/x\">link</a>"),
+            "<p>Example <a href=\"/x\">link</a></p>"
+        )
+        XCTAssertEqual(
+            try ClipboardConversions.normalize(
+                html: "<div style=\"border:1px\">a<span> </span><code>div</code>.</div>"),
+            "<p>a <code>div</code>.</p>"
+        )
+        // Safari marks the same space as a non-breaking one.
+        XCTAssertEqual(
+            try ClipboardConversions.normalize(
+                html: "<span>a</span><span class=\"Apple-converted-space\">&nbsp;</span><em>b</em>"),
+            "<p>a <em>b</em></p>"
+        )
+    }
+
+    func testNormalizeCollapsesSpacesSplitAcrossSpans() throws {
+        XCTAssertEqual(
+            try ClipboardConversions.normalize(html: "<p><span>a </span> <span> b</span></p>"),
+            "<p>a b</p>"
         )
     }
 

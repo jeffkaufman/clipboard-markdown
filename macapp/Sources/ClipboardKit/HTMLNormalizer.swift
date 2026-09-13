@@ -24,20 +24,28 @@ public enum HTMLNormalizer {
 
         guard let body = cleaned.body() else { return "" }
 
+        // Removing a <span> leaves its text next to its neighbors' text as
+        // separate nodes.  Browsers copy a space between two elements as
+        // "<span> </span>", so merge them before deciding what whitespace means.
+        mergeAdjacentText(in: body)
+
         // The source's own indentation is not content.  Collapsing it keeps the
         // output readable, which matters because the plain-text flavor of the
         // clipboard carries this markup verbatim.
         collapseWhitespace(in: body, insidePre: false)
-        try dropInsignificantWhitespace(in: body)
-        trimBlockEdges(in: body)
 
         // Removing a <div> or <span> leaves its text loose in the parent, which
         // would merge into whatever paragraph you paste it into.  Give any such
-        // run a paragraph of its own.
+        // run a paragraph of its own.  This has to come before dropping
+        // whitespace between blocks: until the run is wrapped, a space between
+        // two loose words looks just like indentation between two paragraphs.
         try wrapLooseInlineContent(in: body)
         for quote in try body.select("blockquote") {
             try wrapLooseInlineContent(in: quote)
         }
+
+        try dropInsignificantWhitespace(in: body)
+        trimBlockEdges(in: body)
 
         // An anchor stripped of its href is just noise around the text.
         for link in try body.select("a") where !link.hasAttr("href") {
@@ -55,6 +63,25 @@ public enum HTMLNormalizer {
             .map { try $0.outerHtml() }
             .joined(separator: "\n")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func mergeAdjacentText(in parent: Element) {
+        var previous: TextNode?
+        for node in parent.getChildNodes() {
+            if let text = node as? TextNode {
+                if let previous {
+                    _ = previous.text(previous.getWholeText() + text.getWholeText())
+                    try? text.remove()
+                } else {
+                    previous = text
+                }
+            } else {
+                previous = nil
+                if let element = node as? Element {
+                    mergeAdjacentText(in: element)
+                }
+            }
+        }
     }
 
     /// HTML renders any run of whitespace as a single space, so collapse them.
@@ -169,7 +196,7 @@ public enum HTMLNormalizer {
 
     /// Old editors still emit these; normalizing them keeps the output uniform.
     private static let legacyEquivalents = [
-        "b": "strong", "i": "em", "strike": "del",
+        "b": "strong", "i": "em", "s": "del", "strike": "del",
     ]
 
     private static func modernizeLegacyTags(in document: Document) throws {
