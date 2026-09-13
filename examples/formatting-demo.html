@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clipboard Formatting Demo</title>
+<style>
+body {
+  background: #1f6b2a;
+  color: #ff4d4d;
+  font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+  font-size: 18px;
+  max-width: 50em;
+  margin: 0 auto;
+  padding: 1em;
+}
+h1 {
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 3em;
+  color: yellow;
+  text-shadow: 3px 3px 0 magenta;
+  text-align: center;
+}
+h2 {
+  font-family: Georgia, serif;
+  color: cyan;
+  border-bottom: 4px dashed orange;
+}
+h3 {
+  font-family: "Courier New", monospace;
+  color: #ffb3ff;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+a { color: #ffff66; }
+code, pre {
+  background: black;
+  color: lime;
+}
+pre { padding: 0.5em; }
+blockquote {
+  background: #ffe4b5;
+  color: #8b0000;
+  border-left: 10px solid purple;
+  margin-left: 0;
+  padding: 0.5em 1em;
+  font-style: italic;
+}
+table { border-collapse: collapse; background: navy; color: white; }
+th, td { border: 2px solid gold; padding: 0.3em 0.6em; }
+th { background: crimson; }
+dt { color: orange; }
+hr { border: 3px dotted pink; }
+.note {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #ddd;
+}
+.box {
+  border: 3px solid white;
+  border-radius: 12px;
+  padding: 0.5em 1em;
+  background: #333;
+  color: #9ef;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #4f46e5, #9333ea);
+  color: white;
+  font-size: 14px;
+}
+.fake-bold { font-weight: bold; }
+.fake-italic { font-style: italic; }
+.fake-underline { text-decoration: underline; }
+.fake-heading { font-size: 2em; font-weight: bold; color: cyan; }
+.shouty { text-transform: uppercase; }
+.small-caps { font-variant: small-caps; }
+</style>
+</head>
+<body>
+
+<h1>Clipboard Formatting Demo</h1>
+
+<p class="note">Select everything on this page, copy it, run <b>Normalize
+Clipboard</b> or <b>Convert Clipboard to Markdown</b>, and paste somewhere.
+Each item below says what should happen to it.</p>
+
+<h2>Kept</h2>
+
+<h3>Text formatting</h3>
+
+<p>This paragraph has <b>bold</b>, <i>italic</i>,
+<b><i>bold italic</i></b>, <s>strikethrough</s>,
+<code>inline_code()</code>, and
+<a href="https://www.jefftk.com/p/clipboard-normalization">a link</a>.</p>
+
+<p><u>Underlined text</u> stays underlined when normalizing, but Markdown has
+no underline, so there it becomes italic.</p>
+
+<p>Superscripts and subscripts: E = mc<sup>2</sup>, H<sub>2</sub>O,
+and x<sup>n+1</sup>.  Normalizing keeps them as they are; Markdown turns them
+into Unicode characters where it can.</p>
+
+<p>A line break goes here,<br>
+so this should start a new line in the same paragraph.</p>
+
+<h3>Headings</h3>
+
+<h4>A fourth-level heading</h4>
+<h5>A fifth-level heading</h5>
+<h6>A sixth-level heading</h6>
+
+<h3>Lists</h3>
+
+<ul>
+  <li>A bulleted item</li>
+  <li>An item with a nested list:
+    <ul>
+      <li>Nested item with <b>bold</b></li>
+      <li>Nested item with <a href="https://example.com">a link</a></li>
+    </ul>
+  </li>
+  <li>A final bulleted item</li>
+</ul>
+
+<ol start="7">
+  <li>A numbered list that starts at seven</li>
+  <li>Eight</li>
+  <li>Nine, with a nested numbered list:
+    <ol>
+      <li>Nine point one</li>
+      <li>Nine point two</li>
+    </ol>
+  </li>
+</ol>
+
+<h3>Quotes and code</h3>
+
+<blockquote>
+  <p>A blockquote with <b>bold</b> and <a href="https://example.com">a
+  link</a>.  The quote survives; the peach background, purple bar, and dark
+  red text do not.</p>
+  <p>A second paragraph in the same quote.</p>
+</blockquote>
+
+<pre><code class="language-python">def greet(name):
+    # Indentation and line breaks inside a code block are kept.
+    print(f"Hello, {name}!")
+</code></pre>
+
+<h3>Tables</h3>
+
+<table>
+  <thead>
+    <tr><th>Instrument</th><th>Family</th><th>Strings</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Fiddle</td><td>Violin</td><td>4</td></tr>
+    <tr><td>Mandolin</td><td>Lute</td><td>8</td></tr>
+    <tr><td colspan="2">This cell spans two columns when normalizing, but
+      not in Markdown</td><td>?</td></tr>
+  </tbody>
+</table>
+
+<h3>Other structure</h3>
+
+<p>An image, with its alt text:</p>
+
+<p><img src="https://www.jefftk.com/clipboard-modification-app-icons.png"
+  alt="Icons for the clipboard apps" width="275" height="149"></p>
+
+<dl>
+  <dt>Description list term</dt>
+  <dd>Its definition.  Normalizing keeps this as a description list; Markdown
+  has none, so there the term and definition become plain paragraphs.</dd>
+</dl>
+
+<p>A horizontal rule follows:</p>
+
+<hr>
+
+<h2>Dropped</h2>
+
+<h3>Styling</h3>
+
+<p>Everything about how this page looks is dropped: the
+<span style="color: blue; background: yellow">text and background
+colors</span>, the <span style="font-family: 'Times New Roman', serif">font
+family</span>, <span style="font-size: 32px">font sizes</span>,
+<span style="letter-spacing: 0.5em">letter spacing</span>,
+<span style="text-shadow: 2px 2px 2px black">shadows</span>, and
+<mark>highlighting</mark>.  The words stay; only the look goes.</p>
+
+<p style="text-align: center">This paragraph is centered, but will paste
+left-aligned.</p>
+
+<p style="text-align: right">This one is right-aligned, and will too.</p>
+
+<p><small>Small text</small> and <big>big text</big> become ordinary text,
+and so does <abbr title="HyperText Markup Language">HTML</abbr> in an
+abbreviation.</p>
+
+<h3>Formatting done with CSS instead of tags</h3>
+
+<p>Formatting is kept when it uses real tags, like <b>this bold</b>, but not
+when the page fakes it with styles: <span class="fake-bold">this looks
+bold</span>, <span class="fake-italic">this looks italic</span>, and
+<span class="fake-underline">this looks underlined</span>, but all three
+paste as plain text.</p>
+
+<p class="fake-heading">This looks like a heading, but is a styled paragraph,
+so it pastes as ordinary text.</p>
+
+<p>Styles that change the text itself are lost too: <span class="shouty">this
+is written in lowercase</span> and styled to look uppercase, and
+<span class="small-caps">this is in small caps</span>.</p>
+
+<h3>Layout</h3>
+
+<div class="box">This rounded box is a <code>div</code>.  The border,
+padding, and background go away, and the text becomes a normal
+paragraph.</div>
+
+<p>Here is a <span class="badge">badge</span> in the middle of a sentence;
+it pastes as just the word.</p>
+
+<h3>Unsafe or unsupported content</h3>
+
+<p>A <a href="javascript:alert('hi')">javascript: link</a> keeps its text but
+loses the link, and so does a
+<a href="file:///etc/hosts">link to a local file</a>.</p>
+
+<p>An image embedded as a data URL is removed entirely:<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP8AAP///ywAAAAAAQABAAACAkQBADs="
+  alt="red pixel" width="20" height="20" style="border: 1px solid white">
+(there was a small red square before this).</p>
+
+<hr>
+
+<p class="note">The source for this page is <a
+href="https://github.com/jeffkaufman/clipboard-markdown/blob/main/examples/formatting-demo.html">examples/formatting-demo.html</a>.</p>
+
+</body>
+</html>
