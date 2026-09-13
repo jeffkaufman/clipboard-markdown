@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds "Clipboard Markdown.app", the native menu bar app in macapp/.
+# Builds "Clipboard Normalizer.app", the native menu bar app in macapp/.
 #
 # This is the App Store track.  The older Platypus apps built by build-apps.sh
 # shell out to pandoc, which cannot be sandboxed or shipped on the App Store
@@ -10,31 +10,32 @@
 #                   for running locally.  For the App Store, use your
 #                   "Apple Distribution: ..." identity.  For a notarized
 #                   download outside the store, use "Developer ID Application: ...".
-#   APP_NAME        bundle name, defaults to "Clipboard Markdown".  Set it
+#   APP_NAME        bundle name, defaults to "Clipboard Normalizer".  Set it
 #                   together with BUNDLE_ID to build a variant that installs
 #                   alongside the release app instead of replacing it.
-#   BUNDLE_ID       defaults to com.jefftk.ClipboardMarkdown
+#   BUNDLE_ID       defaults to com.jefftk.ClipboardNormalizer
 #   SHORT_VERSION   marketing version, defaults to 1.0
 #   BUILD_VERSION   build number, must increase with every App Store upload
 #   ICON            source PNG for the app and menu bar icons
 #   PROVISIONING_PROFILE
-#                   .provisionprofile to embed (App Store builds)
+#                   .provisionprofile to embed (App Store builds).  When set,
+#                   the App Store entitlements are derived from it.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE_DIR="$SCRIPT_DIR/macapp"
-APP_NAME="${APP_NAME:-Clipboard Markdown}"
+APP_NAME="${APP_NAME:-Clipboard Normalizer}"
 APP="$SCRIPT_DIR/$APP_NAME.app"
 # The executable is named after the app, so two variants are told apart in
 # Activity Monitor, in crash reports, and by killall.
 EXECUTABLE="$(echo "$APP_NAME" | tr -cd '[:alnum:]')"
 
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
-BUNDLE_ID="${BUNDLE_ID:-com.jefftk.ClipboardMarkdown}"
+BUNDLE_ID="${BUNDLE_ID:-com.jefftk.ClipboardNormalizer}"
 SHORT_VERSION="${SHORT_VERSION:-1.0}"
 BUILD_VERSION="${BUILD_VERSION:-1}"
 COPYRIGHT="${COPYRIGHT:-Copyright © $(date +%Y) Jeff Kaufman. MIT licensed.}"
-ICON="${ICON:-$SCRIPT_DIR/logos/clipboard-md.png}"
+ICON="${ICON:-$SCRIPT_DIR/logos/clipboard-n.png}"
 
 # Universal, so one upload covers Apple Silicon and Intel.
 ARCHS=(--arch arm64 --arch x86_64)
@@ -78,14 +79,43 @@ sips -z 72 72 "$WORK/square.png" \
 
 # App Store builds carry a provisioning profile, which must be in place
 # before signing.
+ENTITLEMENTS="$PACKAGE_DIR/Resources/ClipboardMarkdown.entitlements"
 if [ -n "${PROVISIONING_PROFILE:-}" ]; then
     echo "Embedding $(basename "$PROVISIONING_PROFILE")"
     cp "$PROVISIONING_PROFILE" "$APP/Contents/embedded.provisionprofile"
+
+    # App Store Connect rejects a build whose signature is missing these two,
+    # and they have to agree with the embedded profile.  Reading the team out
+    # of the profile keeps them in sync automatically, instead of leaving a
+    # second copy of the team ID around to drift.  Xcode does this part for
+    # projects it builds; here it is ours to do.
+    security cms -D -i "$PROVISIONING_PROFILE" > "$WORK/profile.plist"
+    TEAM_ID="$(/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' "$WORK/profile.plist")"
+    PROFILE_APP_ID="$(/usr/libexec/PlistBuddy \
+        -c 'Print :Entitlements:com.apple.application-identifier' "$WORK/profile.plist")"
+    APP_ID="$TEAM_ID.$BUNDLE_ID"
+    if [ "$PROFILE_APP_ID" != "$APP_ID" ]; then
+        echo "Error: profile is for $PROFILE_APP_ID, but this build is $APP_ID." >&2
+        exit 1
+    fi
+
+    ENTITLEMENTS="$WORK/entitlements.plist"
+    cp "$PACKAGE_DIR/Resources/ClipboardMarkdown.entitlements" "$ENTITLEMENTS"
+    /usr/libexec/PlistBuddy \
+        -c "Add :com.apple.application-identifier string $APP_ID" \
+        -c "Add :com.apple.developer.team-identifier string $TEAM_ID" \
+        "$ENTITLEMENTS" >/dev/null
 fi
+
+# A profile downloaded in a browser carries com.apple.quarantine, and copying
+# it in brings the attribute along.  App Store Connect rejects a package whose
+# app holds that attribute on any file (error 91109), so clear the bundle
+# before signing rather than after, which would invalidate the signature.
+xattr -cr "$APP"
 
 echo "Signing with identity: $SIGN_IDENTITY"
 SIGN_ARGS=(--force --sign "$SIGN_IDENTITY"
-           --entitlements "$PACKAGE_DIR/Resources/ClipboardMarkdown.entitlements"
+           --entitlements "$ENTITLEMENTS"
            --options runtime)
 if [ "$SIGN_IDENTITY" = "-" ]; then
     # Ad-hoc signatures cannot be timestamped.

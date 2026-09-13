@@ -14,7 +14,7 @@ where it would match the style of what I was already working on.
 
 See https://www.jefftk.com/p/clipboard-normalization
 
-## Clipboard Markdown (menu bar app)
+## Clipboard Normalizer (menu bar app)
 
 `macapp/` holds a single native menu bar app that does all three conversions:
 
@@ -251,7 +251,7 @@ uploads them to the server. This target is specific to the maintainer's setup.
 needs, one time:
 
 1. An Apple Developer Program membership.
-2. An App ID for `com.jefftk.ClipboardMarkdown` in the developer portal.
+2. An App ID for `com.jefftk.ClipboardNormalizer` in the developer portal.
 3. "Apple Distribution" and "Mac Installer Distribution" certificates in your
    keychain (`security find-identity -v` lists what you have).
 4. A Mac App Store provisioning profile for that App ID.
@@ -268,7 +268,15 @@ $ SIGN_IDENTITY="Apple Distribution: Your Name (TEAMID)" \
 ```
 
 `BUILD_VERSION` has to increase with every upload. Upload the resulting
-`ClipboardMarkdown.pkg` with Transporter.app or `xcrun altool --upload-app`.
+`ClipboardNormalizer.pkg` with Transporter.app or `xcrun altool --upload-app`.
+
+The App Store also requires the signature to carry `application-identifier` and
+`team-identifier` entitlements, which Xcode would normally add. `build-app.sh`
+reads them out of the provisioning profile instead, so there is no team ID to
+keep in sync by hand, and a profile for the wrong App ID fails the build rather
+than the upload.
+
+The listing text lives in `app-store-metadata.md`.
 
 Note that the Pandoc-based apps cannot go to the App Store: a sandboxed app
 cannot run a binary from `/opt/homebrew`, and Pandoc is GPL-licensed, which is

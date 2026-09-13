@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds and packages "Clipboard Markdown.app" as a signed .pkg ready to upload
+# Builds and packages "Clipboard Normalizer.app" as a signed .pkg ready to upload
 # to App Store Connect.
 #
 # Before this will work you need, once:
@@ -21,8 +21,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP="$SCRIPT_DIR/Clipboard Markdown.app"
-PKG="$SCRIPT_DIR/ClipboardMarkdown.pkg"
+APP="$SCRIPT_DIR/Clipboard Normalizer.app"
+PKG="$SCRIPT_DIR/ClipboardNormalizer.pkg"
 
 for required in SIGN_IDENTITY INSTALLER_IDENTITY PROVISIONING_PROFILE; do
     if [ -z "${!required:-}" ]; then

@@ -12,22 +12,23 @@ app:
 	./build-app.sh
 
 app-install: app
-	killall "Clipboard Markdown" 2>/dev/null || true
-	rm -rf "/Applications/Clipboard Markdown.app"
-	cp -r "Clipboard Markdown.app" /Applications/
-	open "/Applications/Clipboard Markdown.app"
+	killall "Clipboard Normalizer" 2>/dev/null || true
+	rm -rf "/Applications/Clipboard Normalizer.app"
+	cp -r "Clipboard Normalizer.app" /Applications/
+	open "/Applications/Clipboard Normalizer.app"
 
 # A local development build.  It uses its own bundle identifier, so macOS keeps
 # it entirely separate from the release app: separate sandbox container,
 # separate login item, no LaunchServices confusion.  Both can run at once, and
-# the "N" icon tells them apart in the menu bar.
+# the plain clipboard icon tells the dev build apart from the release build's
+# clipboard-with-an-N in the menu bar.
 DEV_NAME = Clipboard Normalizer (Dev)
-DEV_BUNDLE_ID = com.jefftk.ClipboardMarkdown.dev
+DEV_BUNDLE_ID = com.jefftk.ClipboardNormalizer.dev
 
 dev:
 	APP_NAME="$(DEV_NAME)" \
 	BUNDLE_ID="$(DEV_BUNDLE_ID)" \
-	ICON="$(CURDIR)/logos/clipboard-n.png" \
+	ICON="$(CURDIR)/logos/clipboard-md.png" \
 	  ./build-app.sh
 
 dev-install: dev
@@ -82,9 +83,9 @@ clean:
 	rm -rf logos/*.iconset
 	rm -rf "Markdownify Clipboard.app"
 	rm -rf "Normalize Clipboard.app"
-	rm -rf "Clipboard Markdown.app"
+	rm -rf "Clipboard Normalizer.app"
 	rm -rf "$(DEV_NAME).app"
-	rm -f ClipboardMarkdown.pkg
+	rm -f ClipboardNormalizer.pkg
 	rm -rf macapp/.build
 
 .PHONY: all apps install distribute clean app app-install app-store app-test dev dev-install
